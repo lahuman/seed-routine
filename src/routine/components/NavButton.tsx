@@ -1,16 +1,16 @@
 import React from 'react';
-import { styles } from '../styles';
 
 interface NavButtonProps {
     title: string;
     icon: React.ElementType;
     active: boolean;
     onClick: () => void;
+    styles: { [key: string]: React.CSSProperties };
 }
 
-export const NavButton: React.FC<NavButtonProps> = ({ title, icon: Icon, active, onClick }) => (
+export const NavButton: React.FC<NavButtonProps> = ({ title, icon: Icon, active, onClick, styles }) => (
     <button onClick={onClick} style={{...styles.navButton, ...(active && styles.navButtonActive)}}>
-        <Icon color={active ? '#3B82F6' : '#4B5563'} size={24} />
+        <Icon color={active ? styles.navButtonTextActive.color : styles.navButtonText.color} size={24} />
         <p style={{...styles.navButtonText, ...(active && styles.navButtonTextActive)}}>{title}</p>
     </button>
 );

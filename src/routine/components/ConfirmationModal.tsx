@@ -1,5 +1,4 @@
 import React from 'react';
-import { styles } from '../styles';
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -7,10 +6,11 @@ interface ConfirmationModalProps {
     onClose: () => void;
     onConfirm: () => void;
     t: (key: string) => string;
+    styles: { [key: string]: React.CSSProperties };
 }
 
 // 커스텀 확인 모달 컴포넌트
-export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, message, onClose, onConfirm, t }) => {
+export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, message, onClose, onConfirm, t, styles }) => {
     if (!isOpen) return null;
 
     const handleConfirm = () => {

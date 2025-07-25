@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { Trash2 } from 'lucide-react';
-import { styles } from '../styles';
 import { db, appId } from '../firebase';
 import { HabitItem } from '../components/HabitItem';
 import type { Habit } from '../types';
@@ -12,9 +11,10 @@ interface HabitManagerProps {
     onDeleteHabit: (habitId: string) => void;
     setNotification: (message: string) => void;
     t: (key: string) => string;
+    styles: { [key: string]: React.CSSProperties };
 }
 
-export const HabitManager: React.FC<HabitManagerProps> = ({ habits, userId, onDeleteHabit, setNotification, t }) => {
+export const HabitManager: React.FC<HabitManagerProps> = ({ habits, userId, onDeleteHabit, setNotification, t, styles }) => {
     const [newHabit, setNewHabit] = useState('');
     
     const handleAddHabit = async () => {
@@ -65,6 +65,7 @@ export const HabitManager: React.FC<HabitManagerProps> = ({ habits, userId, onDe
                         isCompleted={false} 
                         onToggle={() => {}} 
                         showCheckbox={false} 
+                        styles={styles}
                     />
                     <button style={styles.transparentButton} onClick={() => onDeleteHabit(habit.id)}><Trash2 color="#EF4444" size={20} /></button>
                 </div>

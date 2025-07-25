@@ -7,6 +7,14 @@ export interface Habit {
     userId: string;
 }
 
+export interface RoutineGroup {
+    id: string;
+    name: string;
+    userId: string;
+    createdAt: Timestamp;
+    order: number;
+}
+
 export interface Routine {
     id: string;
     name: string;
@@ -15,6 +23,7 @@ export interface Routine {
     createdAt: Timestamp;
     updatedAt?: Timestamp;
     order: number;
+    groupId?: string | null;
 }
 
 export interface Progress {

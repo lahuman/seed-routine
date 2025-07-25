@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import { styles } from '../styles';
 
 interface NotificationProps {
     message: string;
     onClose: () => void;
+    styles: { [key: string]: React.CSSProperties };
 }
 
 // 커스텀 알림 컴포넌트
-export const Notification: React.FC<NotificationProps> = ({ message, onClose }) => {
+export const Notification: React.FC<NotificationProps> = ({ message, onClose, styles }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();

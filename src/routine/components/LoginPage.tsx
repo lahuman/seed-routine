@@ -1,13 +1,13 @@
 import React from 'react';
-import { styles } from '../styles';
 
 interface LoginPageProps {
     onLogin: () => void;
     t: (key: string) => string;
+    styles: { [key: string]: React.CSSProperties };
 }
 
 // LoginPage 컴포넌트
-export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, t }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, t, styles }) => {
     return (
         <div style={styles.centerContainer}>
             <div style={{ textAlign: 'center', padding: '20px' }}>

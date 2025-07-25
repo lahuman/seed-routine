@@ -6,8 +6,8 @@ import { Home, PlusSquare, ListChecks, BarChart2 } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { translations } from './constants';
 import { getFormattedDate } from './utils';
-import { styles } from './styles';
-import type { Habit, Routine, Progress } from './types';
+import { getStyles } from './styles';
+import type { Habit, Routine, Progress, RoutineGroup } from './types';
 
 import { Notification } from './components/Notification';
 import { ConfirmationModal } from './components/ConfirmationModal';
@@ -18,19 +18,30 @@ import { HabitManager } from './views/HabitManager';
 import { RoutineBuilder } from './views/RoutineBuilder';
 import { Statistics } from './views/Statistics';
 
-// 메인 앱 컴포넌트
 const App = () => {
     const [user, setUser] = useState<User | null>(null);
     const [isAuthReady, setIsAuthReady] = useState(false);
     const [currentView, setCurrentView] = useState('dashboard');
     const [language, setLanguage] = useState('ko');
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const [habits, setHabits] = useState<Habit[]>([]);
     const [routines, setRoutines] = useState<Routine[]>([]);
+    const [routineGroups, setRoutineGroups] = useState<RoutineGroup[]>([]);
     const [progressHistory, setProgressHistory] = useState<Progress[]>([]);
     
     const [notification, setNotification] = useState('');
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, message: '', onConfirm: () => {} });
+
+    const styles = useMemo(() => getStyles(isDarkMode), [isDarkMode]);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setIsDarkMode(mediaQuery.matches);
+        const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+        mediaQuery.addEventListener('change', handler);
+        return () => mediaQuery.removeEventListener('change', handler);
+    }, []);
 
     const t = (key: string, ...args: any[]): string => {
         const string = translations[language][key] || key;
@@ -40,7 +51,6 @@ const App = () => {
         return string;
     };
 
-    // 인증 상태 리스너
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
@@ -72,7 +82,6 @@ const App = () => {
         }
     };
 
-    // 데이터 리스너 (Firestore)
     useEffect(() => {
         if (!isAuthReady || !user) return;
 
@@ -84,6 +93,11 @@ const App = () => {
         const routinesQuery = query(collection(db, `artifacts/${appId}/users/${user.uid}/routines`));
         const unsubscribeRoutines = onSnapshot(routinesQuery, (snapshot) => {
             setRoutines(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Routine)));
+        });
+
+        const routineGroupsQuery = query(collection(db, `artifacts/${appId}/users/${user.uid}/routine_groups`));
+        const unsubscribeRoutineGroups = onSnapshot(routineGroupsQuery, (snapshot) => {
+            setRoutineGroups(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RoutineGroup)));
         });
 
         const thirtyDaysAgo = new Date();
@@ -100,6 +114,7 @@ const App = () => {
         return () => {
             unsubscribeHabits();
             unsubscribeRoutines();
+            unsubscribeRoutineGroups();
             unsubscribeProgress();
         };
     }, [isAuthReady, user]);
@@ -159,14 +174,14 @@ const App = () => {
     }
 
     if (!user) {
-        return <LoginPage onLogin={handleLogin} t={t} />;
+        return <LoginPage onLogin={handleLogin} t={t} styles={styles} />;
     }
 
     const renderView = () => {
-        const props = { habits, routines, userId: user.uid, dailyProgress, onToggleHabit: handleToggleHabit, setNotification, setConfirmModal, t, language };
+        const props = { habits, routines, routineGroups, userId: user.uid, dailyProgress, onToggleHabit: handleToggleHabit, setNotification, setConfirmModal, t, language, styles };
         switch (currentView) {
             case 'habits':
-                return <HabitManager habits={habits} userId={user.uid} onDeleteHabit={handleDeleteHabit} setNotification={setNotification} t={t} />;
+                return <HabitManager habits={habits} userId={user.uid} onDeleteHabit={handleDeleteHabit} setNotification={setNotification} t={t} styles={styles} />;
             case 'routines':
                 return <RoutineBuilder {...props} />;
             case 'statistics':
@@ -179,13 +194,14 @@ const App = () => {
 
     return (
         <div style={styles.container}>
-            {notification && <Notification message={notification} onClose={() => setNotification('')} />}
+            {notification && <Notification message={notification} onClose={() => setNotification('')} styles={styles} />}
             <ConfirmationModal 
                 isOpen={confirmModal.isOpen} 
                 message={confirmModal.message} 
                 onConfirm={confirmModal.onConfirm}
                 onClose={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
                 t={t}
+                styles={styles}
             />
             <div style={styles.appHeader}>
                 <div style={styles.appHeaderTop}>
@@ -204,10 +220,10 @@ const App = () => {
                 {renderView()}
             </div>
             <div style={styles.navigation}>
-                <NavButton title={t('navToday')} icon={Home} active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} />
-                <NavButton title={t('navHabits')} icon={ListChecks} active={currentView === 'habits'} onClick={() => setCurrentView('habits')} />
-                <NavButton title={t('navRoutines')} icon={PlusSquare} active={currentView === 'routines'} onClick={() => setCurrentView('routines')} />
-                <NavButton title={t('navStats')} icon={BarChart2} active={currentView === 'statistics'} onClick={() => setCurrentView('statistics')} />
+                <NavButton title={t('navToday')} icon={Home} active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} styles={styles} />
+                <NavButton title={t('navHabits')} icon={ListChecks} active={currentView === 'habits'} onClick={() => setCurrentView('habits')} styles={styles} />
+                <NavButton title={t('navRoutines')} icon={PlusSquare} active={currentView === 'routines'} onClick={() => setCurrentView('routines')} styles={styles} />
+                <NavButton title={t('navStats')} icon={BarChart2} active={currentView === 'statistics'} onClick={() => setCurrentView('statistics')} styles={styles} />
             </div>
         </div>
     );
