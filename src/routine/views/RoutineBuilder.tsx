@@ -93,10 +93,37 @@ export const RoutineBuilder: React.FC<RoutineBuilderProps> = ({ habits, routines
         });
     };
 
+    const requestNotificationPermission = async () => {
+        if (!("Notification" in window)) {
+            setNotification(t('notificationNotSupported'));
+            return false;
+        }
+        if (window.Notification.permission === 'granted') {
+            return true;
+        }
+        if (window.Notification.permission === 'denied') {
+            setNotification(t('notificationPermissionDenied'));
+            return false;
+        }
+        const permission = await window.Notification.requestPermission();
+        if (permission === 'granted') {
+            return true;
+        }
+        setNotification(t('notificationPermissionDenied'));
+        return false;
+    };
+
     const handleSaveRoutine = async () => {
         if (newRoutineName.trim() === '' || selectedHabits.length === 0) {
             setNotification(t('routineValidationError'));
             return;
+        }
+
+        if (notificationTime) {
+            const permissionGranted = await requestNotificationPermission();
+            if (!permissionGranted) {
+                return;
+            }
         }
         
         const routineData = {
@@ -341,11 +368,16 @@ export const RoutineBuilder: React.FC<RoutineBuilderProps> = ({ habits, routines
                         </div>
 
                         <p style={styles.modalSubtitle}>{t('notificationTime')}</p>
-                        <input 
-                            type="time" 
-                            style={styles.input} 
-                            value={notificationTime || ''} 
-                            onChange={(e) => setNotificationTime(e.target.value)} 
+                        <input
+                            type="time"
+                            style={styles.input}
+                            value={notificationTime || ''}
+                            onChange={(e) => {
+                                setNotificationTime(e.target.value);
+                                if (e.target.value) {
+                                    requestNotificationPermission();
+                                }
+                            }}
                         />
                         <button style={styles.saveButton} onClick={handleSaveRoutine}><p style={styles.saveButtonText}>{t('save')}</p></button>
                     </div>

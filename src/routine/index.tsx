@@ -119,17 +119,7 @@ const App = () => {
         };
     }, [isAuthReady, user]);
 
-    useEffect(() => {
-        if (!("Notification" in window)) {
-            console.log("This browser does not support desktop notification");
-        } else if (window.Notification.permission !== "denied") {
-            window.Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    console.log("Notification permission granted.");
-                }
-            });
-        }
-    }, []);
+    
 
     const showNotification = (title: string, body: string) => {
         if (window.Notification.permission === "granted") {

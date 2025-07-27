@@ -52,6 +52,8 @@ export const translations = {
         logout: '로그아웃',
         routineNotificationTitle: (routineName: string) => `루틴 알림: ${routineName}`,
         routineNotificationBody: (habitNames: string) => `오늘의 할 일: ${habitNames}`,
+        notificationNotSupported: '이 브라우저는 알림을 지원하지 않습니다.',
+        notificationPermissionDenied: '알림 권한이 거부되었습니다. 브라우저 설정에서 권한을 허용해주세요.',
     },
     en: {
         appName: '🌱 Routine Chain',
