@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { onAuthStateChanged, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, type User, signOut } from 'firebase/auth';
 import { collection, onSnapshot, doc, deleteDoc, query, setDoc, serverTimestamp, arrayUnion, arrayRemove, where, documentId, updateDoc } from 'firebase/firestore';
 import { Home, PlusSquare, ListChecks, BarChart2 } from 'lucide-react';
@@ -13,10 +13,11 @@ import { Notification as NotificationComponent } from './components/Notification
 import { ConfirmationModal } from './components/ConfirmationModal';
 import { LoginPage } from './components/LoginPage';
 import { NavButton } from './components/NavButton';
-import { Dashboard } from './views/Dashboard';
-import { HabitManager } from './views/HabitManager';
-import { RoutineBuilder } from './views/RoutineBuilder';
-import { Statistics } from './views/Statistics';
+
+const Dashboard = lazy(() => import('./views/Dashboard').then(module => ({ default: module.Dashboard })));
+const HabitManager = lazy(() => import('./views/HabitManager').then(module => ({ default: module.HabitManager })));
+const RoutineBuilder = lazy(() => import('./views/RoutineBuilder').then(module => ({ default: module.RoutineBuilder })));
+const Statistics = lazy(() => import('./views/Statistics').then(module => ({ default: module.Statistics })));
 
 const App = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -246,7 +247,9 @@ const App = () => {
                 <p style={styles.appHeaderSubtitle}>{t('appSubtitle')}</p>
             </div>
             <div style={{...styles.content, overflowY: 'auto'}}>
-                {renderView()}
+                <Suspense fallback={<div style={styles.centerContainer}><p style={styles.loadingText}>Loading...</p></div>}>
+                    {renderView()}
+                </Suspense>
             </div>
             <div style={styles.navigation}>
                 <NavButton title={t('navToday')} icon={Home} active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} styles={styles} />
