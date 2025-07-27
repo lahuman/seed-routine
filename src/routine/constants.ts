@@ -20,6 +20,7 @@ export const translations = {
         modalNewRoutineTitle: '새로운 루틴 만들기',
         modalEditRoutineTitle: '루틴 수정',
         routineNamePlaceholder: '루틴 이름',
+        notificationTime: '알림 시간',
         selectHabitsPrompt: '포함할 습관들을 선택해주세요.',
         save: '저장',
         delete: '삭제',
@@ -49,6 +50,8 @@ export const translations = {
         confirm: '확인',
         googleLogin: 'Google 계정으로 로그인',
         logout: '로그아웃',
+        routineNotificationTitle: (routineName: string) => `루틴 알림: ${routineName}`,
+        routineNotificationBody: (habitNames: string) => `오늘의 할 일: ${habitNames}`,
     },
     en: {
         appName: '🌱 Routine Chain',
@@ -70,6 +73,7 @@ export const translations = {
         modalNewRoutineTitle: 'Create New Routine',
         modalEditRoutineTitle: 'Edit Routine',
         routineNamePlaceholder: 'Routine Name',
+        notificationTime: 'Notification Time',
         selectHabitsPrompt: 'Please select habits to include.',
         save: 'Save',
         delete: 'Delete',
@@ -99,5 +103,7 @@ export const translations = {
         confirm: 'Confirm',
         googleLogin: 'Sign in with Google',
         logout: 'Logout',
+        routineNotificationTitle: (routineName: string) => `Routine Reminder: ${routineName}`,
+        routineNotificationBody: (habitNames: string) => `Today's tasks: ${habitNames}`,
     }
 };

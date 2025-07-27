@@ -24,6 +24,7 @@ export interface Routine {
     updatedAt?: Timestamp;
     order: number;
     groupId?: string | null;
+    notificationTime?: string;
 }
 
 export interface Progress {

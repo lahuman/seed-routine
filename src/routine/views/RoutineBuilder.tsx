@@ -21,6 +21,7 @@ export const RoutineBuilder: React.FC<RoutineBuilderProps> = ({ habits, routines
     const [newRoutineName, setNewRoutineName] = useState('');
     const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
     const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+    const [notificationTime, setNotificationTime] = useState<string | undefined>(undefined);
 
     const [groupModalVisible, setGroupModalVisible] = useState(false);
     const [editingGroup, setEditingGroup] = useState<RoutineGroup | null>(null);
@@ -58,6 +59,7 @@ export const RoutineBuilder: React.FC<RoutineBuilderProps> = ({ habits, routines
         setNewRoutineName('');
         setSelectedHabits([]);
         setSelectedGroupId(null);
+        setNotificationTime(undefined);
     };
 
     const closeGroupModal = () => {
@@ -71,6 +73,7 @@ export const RoutineBuilder: React.FC<RoutineBuilderProps> = ({ habits, routines
         setNewRoutineName(routine.name);
         setSelectedHabits(routine.habitIds);
         setSelectedGroupId(routine.groupId || null);
+        setNotificationTime(routine.notificationTime);
         setModalVisible(true);
     };
 
@@ -101,6 +104,7 @@ export const RoutineBuilder: React.FC<RoutineBuilderProps> = ({ habits, routines
             habitIds: selectedHabits,
             userId: userId,
             groupId: selectedGroupId,
+            notificationTime: notificationTime || null,
         };
 
         try {
@@ -335,6 +339,14 @@ export const RoutineBuilder: React.FC<RoutineBuilderProps> = ({ habits, routines
                                 </div>
                             ))}
                         </div>
+
+                        <p style={styles.modalSubtitle}>{t('notificationTime')}</p>
+                        <input 
+                            type="time" 
+                            style={styles.input} 
+                            value={notificationTime || ''} 
+                            onChange={(e) => setNotificationTime(e.target.value)} 
+                        />
                         <button style={styles.saveButton} onClick={handleSaveRoutine}><p style={styles.saveButtonText}>{t('save')}</p></button>
                     </div>
                 </div>

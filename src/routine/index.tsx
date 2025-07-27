@@ -9,7 +9,7 @@ import { getFormattedDate } from './utils';
 import { getStyles } from './styles';
 import type { Habit, Routine, Progress, RoutineGroup } from './types';
 
-import { Notification } from './components/Notification';
+import { Notification as NotificationComponent } from './components/Notification';
 import { ConfirmationModal } from './components/ConfirmationModal';
 import { LoginPage } from './components/LoginPage';
 import { NavButton } from './components/NavButton';
@@ -119,6 +119,45 @@ const App = () => {
         };
     }, [isAuthReady, user]);
 
+    useEffect(() => {
+        if (!("Notification" in window)) {
+            console.log("This browser does not support desktop notification");
+        } else if (window.Notification.permission !== "denied") {
+            window.Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    console.log("Notification permission granted.");
+                }
+            });
+        }
+    }, []);
+
+    const showNotification = (title: string, body: string) => {
+        if (window.Notification.permission === "granted") {
+            new window.Notification(title, { body });
+        }
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            routines.forEach(routine => {
+                if (routine.notificationTime === currentTime) {
+                    const habitsForRoutine = routine.habitIds.map(habitId => habits.find(h => h.id === habitId)?.name).filter(Boolean);
+                    if (habitsForRoutine.length > 0) {
+                        showNotification(
+                            t('routineNotificationTitle', routine.name),
+                            t('routineNotificationBody', habitsForRoutine.join(', '))
+                        );
+                    }
+                }
+            });
+        }, 60000); // 1분마다 체크
+
+        return () => clearInterval(interval);
+    }, [routines, habits, t]);
+
     const dailyProgress = useMemo(() => {
         const todayString = getFormattedDate(new Date());
         const todayData = progressHistory.find(p => p.date === todayString);
@@ -194,7 +233,7 @@ const App = () => {
 
     return (
         <div style={styles.container}>
-            {notification && <Notification message={notification} onClose={() => setNotification('')} styles={styles} />}
+                        {notification && <NotificationComponent message={notification} onClose={() => setNotification('')} styles={styles} />}
             <ConfirmationModal 
                 isOpen={confirmModal.isOpen} 
                 message={confirmModal.message} 

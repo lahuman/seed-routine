@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { Bell } from 'lucide-react';
 import { getFormattedDate } from '../utils';
 import { HabitItem } from '../components/HabitItem';
 import type { Habit, Routine, RoutineGroup } from '../types';
@@ -52,7 +53,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ routines, routineGroups, h
         const progressPercentage = totalHabits > 0 ? (completedCount / totalHabits) * 100 : 0;
         return (
             <div key={routine.id} style={styles.card}>
-                <p style={styles.cardTitle}>{routine.name}</p>
+                <div style={styles.cardHeader}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <p style={styles.cardTitle}>{routine.name}</p>
+                        {routine.notificationTime && (
+                            <div style={{ display: 'flex', alignItems: 'center', marginLeft: '12px' }}>
+                                <Bell size={16} color={styles.subtext?.color} />
+                                <span style={{ ...styles.subtext, marginLeft: '4px' }}>{routine.notificationTime}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
                 <div style={styles.progressBarContainer}><div style={{...styles.progressBar, width: `${progressPercentage}%`}} /></div>
                 <p style={styles.progressText}>{completedCount} / {totalHabits} {t('completed')}</p>
                 {routine.habitIds.map((habitId, index) => {
